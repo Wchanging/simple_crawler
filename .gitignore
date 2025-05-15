@@ -1,0 +1,11 @@
+# 忽略文件夹
+weibo_details/
+weibo_details_test/
+weibo_results2/
+weibo_results3/
+__pycache__/
+
+# 忽略文件
+weibo_cookie.json
+cookies.txt
+weibo_urls.txt
