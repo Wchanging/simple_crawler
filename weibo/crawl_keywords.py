@@ -129,8 +129,8 @@ class WeiboSearchCrawler:
         # 构造搜索URL，需要编码关键词
         from urllib.parse import quote
         encoded_keyword = quote(keyword)
-        # search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}&rd=realtime&tw=realtime&Refer=weibo_realtime"
-        search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}"
+        search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}&rd=realtime&tw=realtime&Refer=weibo_realtime"
+        # search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}"
 
         print(f"开始搜索关键词: {keyword}")
         self.browser.get(search_url)

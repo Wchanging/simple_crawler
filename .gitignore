@@ -1,8 +1,7 @@
 # 忽略文件夹
 weibo_details/
 weibo_details_test/
-weibo_results2/
-weibo_results3/
+weibo_results*/
 __pycache__/
 
 # 忽略文件

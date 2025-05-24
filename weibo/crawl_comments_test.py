@@ -210,26 +210,26 @@ def interactive_mode(mode=2, filepath="weibo_urls.txt", output_file="weibo_detai
     """交互式模式，允许用户选择爬取方式"""
     # 确保目录存在
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    
+
     if mode == "1":
         url = one_url
         if url:
             # 检查文件是否存在及是否为空
             file_exists = os.path.exists(output_file)
             file_empty = not file_exists or os.path.getsize(output_file) == 0
-            
+
             # 根据append参数决定是追加还是覆盖
             file_mode = 'a' if append and file_exists else 'w'
-            
+
             with open(output_file, mode=file_mode, newline='', encoding='utf-8-sig') as file:
                 global csv_writer, count
-                
+
                 # 重置计数器(如果是新文件或不追加)
                 if file_mode == 'w':
                     count = 0
-                    
+
                 csv_writer = csv.writer(file)
-                
+
                 # 只在文件为空时写入表头
                 if file_empty:
                     csv_writer.writerow(['mid', 'review_id', 'sup_comment', 'uid', 'created_at', 'gender', 'text_raw', 'like', 'review_num'])
@@ -248,25 +248,34 @@ if __name__ == "__main__":
     # 读取weibo_urls.txt文件
     with open("weibo_urls.txt", "r", encoding="utf-8") as f:
         urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
-    
+
     # 创建目录(如果不存在)
     os.makedirs("weibo_details", exist_ok=True)
-    
+
     # 第一次调用使用覆盖模式，创建新文件
     first_url = False
-    
-    for url in urls[52:]:
+
+    for url in urls[177:]:
         # 爬取单个微博URL的所有评论
         interactive_mode(mode="1", one_url=url)
-        
+
         # 等待5秒，避免频繁请求
         time.sleep(5)
-        
+
         # 爬取微博详情 - 第一个URL时不追加，之后的URL都追加
         crawl_pipeline([url], append=True)
-        
+
         # 标记已处理第一个URL
         if first_url:
             first_url = False
-            
+
         print(f"微博 {url} 评论爬取完成")
+
+    # # 读取一下评论数据集，根据uid算一下到底有多少个用户
+    # with open("weibo_details/review_data.csv", "r", encoding="utf-8") as f:
+    #     reader = csv.reader(f)
+    #     next(reader)
+    #     uid_set = set()
+    #     for row in reader:
+    #         uid_set.add(row[3])
+    #     print(f"一共爬取了 {len(uid_set)} 个用户的评论")
