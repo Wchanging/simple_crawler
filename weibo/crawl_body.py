@@ -20,6 +20,13 @@ def get_weibo_data(data):
     created_at = data['created_at']
     dt = datetime.strptime(created_at, "%a %b %d %H:%M:%S %z %Y")
     created_at = dt.strftime("%Y-%m-%d %H:%M:%S")
+    # 地区
+    try:
+        region = data['region_name']
+        region = region.replace("发布于 ", "")
+        region = region if region else "未知"
+    except:
+        region = "未知"
     # 图片数量
     pic_num = data['pic_num']
     # 图片url
@@ -53,7 +60,7 @@ def get_weibo_data(data):
     reposts_count = data['reposts_count']
     # 点赞数
     like_count = data['attitudes_count']
-    return mid, uid, user_url, text, created_at, pic_num, pic_url, video_url, comments_count, reposts_count, like_count
+    return mid, uid, user_url, text, created_at, pic_num, pic_url, video_url, comments_count, reposts_count, like_count, region
 
 
 def get_header():
@@ -96,8 +103,8 @@ def crawl_pipeline(urls, file_name='weibo_details/meta_data.csv', append=True):
 
     # 结果保存在csv文件中
     with open(file_name, file_mode, newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['mid', 'uid', 'm_url', 'user_url', 'text', 'created_at', 'pic_num', 'pic_url', 'video_url',
-                      'comments_count', 'reposts_count', 'like_count']
+        fieldnames = ['mid', 'uid', 'text', 'created_at', 'region', 'pic_num', 'pic_url', 'video_url',
+                      'comments_count', 'reposts_count', 'like_count', 'original_url', 'user_url']
         writer = csv.writer(csvfile)
 
         # 如果需要写入表头(新文件或覆盖模式)
@@ -111,10 +118,10 @@ def crawl_pipeline(urls, file_name='weibo_details/meta_data.csv', append=True):
             resp = requests.get(url=url, headers=get_header())
             resp = json.loads(resp.content.decode('utf-8'))
             mid, uid, user_url, text, created_at, pic_num, \
-                pic_url, video_url, comment_count, repost_count, like_count = get_weibo_data(resp)
+                pic_url, video_url, comment_count, repost_count, like_count, region = get_weibo_data(resp)
             # 写入csv文件
-            writer.writerow([mid, uid, original_url, user_url, text, created_at, pic_num, pic_url, video_url,
-                            comment_count, repost_count, like_count])
+            writer.writerow([mid, uid, text, created_at, region, pic_num, pic_url, video_url,
+                            comment_count, repost_count, like_count, original_url, user_url,])
 
             # 每爬一条微博，随机等待2-5秒，防止反爬
             print(f"爬取微博ID: {mid} 成功，等待下一条...")
@@ -124,30 +131,6 @@ def crawl_pipeline(urls, file_name='weibo_details/meta_data.csv', append=True):
 
 
 if __name__ == "__main__":
-    # 测试
-    # original_url = 'https://weibo.com/7895153213/PrxIybNn0?refer_flag=1001030103_'
-    # original_url = 'https://weibo.com/2208370015/PrxqGr1zs'
-    # url = change_url(original_url)
-
-    # resp = requests.get(url=url, headers=get_header())
-    # resp = json.loads(resp.content.decode('utf-8'))
-    # # print(resp)
-    # # 获取微博数据
-    # mid, uid, user_url, text, created_at, pic_num, \
-    #     pic_url, video_url, comment_count, repost_count, like_count = get_weibo_data(resp)
-    # print(f"微博ID: {mid}")
-    # print(f"作者ID: {uid}")
-    # print(f"作者url: {user_url}")
-    # print(f"微博url: {original_url}")
-    # print(f"微博内容: {text}")
-    # print(f"发布时间: {created_at}")
-    # print(f"图片数量: {pic_num}")
-    # print(f"图片url: {pic_url}")
-    # print(f"评论数: {comment_count}")
-    # print(f"转发数: {repost_count}")
-    # print(f"点赞数: {like_count}")
-    # print(f"视频url: {video_url}")
-
     # 打开weibo_results2/merged.json文件
     # with open("weibo_results2/merged.json", "r", encoding="utf-8") as f:
     #     data = json.load(f)
@@ -158,8 +141,9 @@ if __name__ == "__main__":
     #         # 转换为新的url
     #         urls.append(original_url)
     # # print(urls)
-    # # 爬取微博数据
-    # crawl_pipeline(['https://weibo.com/1768267087/PlzbpgwaR?refer_flag=1001030103_'])
+
+    # 爬取微博数据
+    # crawl_pipeline(['https://weibo.com/1314608344/PllANsMlp?refer_flag=1001030103_'])
     # print(f"微博数据已保存到weibo_details/meta_data.csv")
 
     # 看看爬取的结果有多少条
@@ -172,3 +156,21 @@ if __name__ == "__main__":
         print(f"爬取到 {count} 条微博数据")
     # 关闭文件
     f.close()
+
+    # # 读取微博数据中的图片url
+    # with open("weibo_details/meta_data.csv", "r", encoding="utf-8") as f:
+    #     reader = csv.reader(f)
+    #     # 读取表头
+    #     header = next(reader)
+    #     # 输出图片url
+    #     for row in reader:
+    #         # 获取图片url
+    #         pic_url = row[6]
+    #         print(type(pic_url))
+    #         # 将字符串转换为列表
+    #         pic_url = pic_url.strip("[]").replace("'", "").split(", ")
+    #         # 输出图片url
+    #         for url in pic_url:
+    #             print(url)
+    # # 关闭文件
+    # f.close()

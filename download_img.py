@@ -1,9 +1,7 @@
 import requests
 
-#下载图片
-# https://wx3.sinaimg.cn/orj1080/006H8U51gy1i1e63awha6j30u00mi77t.jpg
 
-# 下载
+# 下载微博图片
 def download_image(url, save_path):
     try:
         response = requests.get(url, stream=True)
@@ -16,6 +14,7 @@ def download_image(url, save_path):
             print(f"下载失败，状态码: {response.status_code}")
     except Exception as e:
         print(f"下载图片失败: {e}")
+
 
 # 测试
 if __name__ == "__main__":

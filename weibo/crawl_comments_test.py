@@ -65,6 +65,11 @@ def get_comment_data(data):
     text_raw = data['text_raw']
     like = data['like_counts']
     try:
+        source = data['source']
+        source = source.replace("来自", "")
+    except:
+        source = "未知"
+    try:
         total_number = data['total_number']
     except:
         total_number = 0
@@ -79,7 +84,7 @@ def get_comment_data(data):
     except:
         gender = '未知'
 
-    return idstr, rootidstr, created_at, user_id, text_raw, like, total_number, gender
+    return idstr, rootidstr, created_at, user_id, text_raw, like, total_number, gender, source
 
 
 def get_comment_info(uid, mid, max_id, fetch_level, orig_mid):
@@ -110,10 +115,10 @@ def get_comment_info(uid, mid, max_id, fetch_level, orig_mid):
             print(f"爬取评论-等待 {sleep_time:.2f} 秒...")
             time.sleep(sleep_time)
 
-        idstr, rootidstr, created_at, user_id, text_raw, like, total_number, gender = get_comment_data(data)
+        idstr, rootidstr, created_at, user_id, text_raw, like, total_number, gender, source = get_comment_data(data)
         if fetch_level == 0:
             rootidstr = ''
-        csv_writer.writerow([orig_mid, idstr, rootidstr, user_id, created_at, gender, text_raw, like, total_number])
+        csv_writer.writerow([orig_mid, idstr, rootidstr, user_id, created_at, gender, source, text_raw, like, total_number])
         # 判断是否存在二级评论
         if total_number > 0 and fetch_level == 0:
             get_comment_info(uid, idstr, 0, 1, orig_mid)
@@ -180,7 +185,7 @@ def batch_crawl_from_file(filepath="weibo_urls.txt", output_file="微博评论�
         # 如果已有表头，则不再写入
         if file.tell() == 0:
             # 写入表头
-            csv_writer.writerow(['mid', 'review_id', 'sup_comment', 'uid', 'created_at', 'gender', 'text_raw', 'like', 'review_num'])
+            csv_writer.writerow(['mid', 'review_id', 'sup_comment', 'uid', 'created_at', 'gender', 'source', 'text_raw', 'like', 'review_num'])
 
         start = time.time()
         total_urls = len(urls)
@@ -232,7 +237,7 @@ def interactive_mode(mode=2, filepath="weibo_urls.txt", output_file="weibo_detai
 
                 # 只在文件为空时写入表头
                 if file_empty:
-                    csv_writer.writerow(['mid', 'review_id', 'sup_comment', 'uid', 'created_at', 'gender', 'text_raw', 'like', 'review_num'])
+                    csv_writer.writerow(['mid', 'review_id', 'sup_comment', 'uid', 'created_at', 'gender', 'source', 'text_raw', 'like', 'review_num'])
 
                 start = time.time()
                 crawl_single_weibo(url)
@@ -255,12 +260,12 @@ if __name__ == "__main__":
     # 第一次调用使用覆盖模式，创建新文件
     first_url = False
 
-    for url in urls[177:]:
+    for url in urls[124:]:
         # 爬取单个微博URL的所有评论
         interactive_mode(mode="1", one_url=url)
 
-        # 等待5秒，避免频繁请求
-        time.sleep(5)
+        print(f"等待5秒，避免频繁请求")
+        time.sleep(10)
 
         # 爬取微博详情 - 第一个URL时不追加，之后的URL都追加
         crawl_pipeline([url], append=True)
@@ -268,8 +273,6 @@ if __name__ == "__main__":
         # 标记已处理第一个URL
         if first_url:
             first_url = False
-
-        print(f"微博 {url} 评论爬取完成")
 
     # # 读取一下评论数据集，根据uid算一下到底有多少个用户
     # with open("weibo_details/review_data.csv", "r", encoding="utf-8") as f:
