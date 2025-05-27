@@ -13,3 +13,4 @@ weibo_urls.txt
 zhihu_cookie*.json
 zhihu_urls.txt
 comments*.csv
+filtered_urls*.txt
