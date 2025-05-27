@@ -13,6 +13,7 @@ def count_comments_in_csv(csv_file):
 
     df = pd.read_csv(csv_file, encoding="utf-8-sig")
     total_comments = len(df)
+    # print(df.head())  # 打印前几行数据以检查格式
     print(f"CSV文件 {csv_file} 包含 {total_comments} 条评论")
     return total_comments
 
@@ -135,6 +136,10 @@ if __name__ == "__main__":
     csv_file = 'zhihu/comments_full.csv'
     urls_file = 'zhihu/zhihu_urls.txt'
 
+    # 步骤1: 计算comments_full.csv中的评论数量和ID数量
+    print("\n步骤1: 计算评论数量和ID数量")
+    total_comments = count_comments_in_csv(csv_file)
+
     # print("\n步骤2: 筛选URL")
-    filtered_urls = filter_urls_in_csv(urls_file, csv_file)
-    print(f"筛选后的URL数量: {len(filtered_urls)}")
+    # filtered_urls = filter_urls_in_csv(urls_file, csv_file)
+    # print(f"筛选后的URL数量: {len(filtered_urls)}")
