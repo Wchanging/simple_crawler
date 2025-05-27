@@ -2,9 +2,14 @@
 weibo_details*/
 weibo_details_test/
 weibo_results*/
+zhihu/zhihu_results*/
+toutiao/
 __pycache__/
 
 # 忽略文件
 weibo_cookie.json
 cookies.txt
 weibo_urls.txt
+zhihu_cookie*.json
+zhihu_urls.txt
+comments*.csv

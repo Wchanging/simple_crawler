@@ -156,7 +156,7 @@ def crawl_single_weibo(url):
         return False
 
 
-def batch_crawl_from_file(filepath="weibo_urls.txt", output_file="微博评论汇总.csv"):
+def batch_crawl_from_file(filepath="weibo/weibo_urls.txt", output_file="微博评论汇总.csv"):
     """从文件中读取多个微博URL并批量爬取"""
     global count, csv_writer
 
@@ -211,7 +211,7 @@ def batch_crawl_from_file(filepath="weibo_urls.txt", output_file="微博评论�
     print(f"评论数据已保存至: {output_file}")
 
 
-def interactive_mode(mode=2, filepath="weibo_urls.txt", output_file="weibo_details/review_data.csv", one_url="", append=True):
+def interactive_mode(mode=2, filepath="weibo/weibo_urls.txt", output_file="weibo_details/review_data.csv", one_url="", append=True):
     """交互式模式，允许用户选择爬取方式"""
     # 确保目录存在
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
@@ -251,7 +251,7 @@ def interactive_mode(mode=2, filepath="weibo_urls.txt", output_file="weibo_detai
 
 if __name__ == "__main__":
     # 读取weibo_urls.txt文件
-    with open("weibo_urls.txt", "r", encoding="utf-8") as f:
+    with open("weibo/weibo_urls.txt", "r", encoding="utf-8") as f:
         urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
     # 创建目录(如果不存在)

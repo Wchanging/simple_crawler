@@ -2,7 +2,7 @@ import json
 import os
 
 
-def merge_json_files(directory="weibo_results2", output_file="merged.json", incremental=True):
+def merge_json_files(directory="weibo/weibo_results2", output_file="merged.json", incremental=True):
     """
     合并指定目录下的所有JSON文件
 
@@ -85,7 +85,7 @@ def merge_json_files(directory="weibo_results2", output_file="merged.json", incr
     return all_data
 
 
-def extract_urls_to_file(json_path="weibo_results2/merged.json", output_file="weibo_urls.txt", append=True):
+def extract_urls_to_file(json_path="weibo/weibo_results2/merged.json", output_file="weibo_urls.txt", append=True):
     """
     从JSON文件中提取微博URL并保存到文本文件
 
@@ -141,7 +141,7 @@ def extract_urls_to_file(json_path="weibo_results2/merged.json", output_file="we
     print(f"已保存 {len(sorted_urls)} 条微博URL到 {output_file} (新增 {len(all_urls) - len(existing_urls)} 条)")
 
 
-def main(directory="weibo_results3", merged_json="merge.json", urls_file="weibo_urls.txt"):
+def main(directory="weibo/weibo_results3", merged_json="merge.json", urls_file="weibo_urls.txt"):
     """
     主函数：执行合并JSON和提取URL的完整流程
     """
