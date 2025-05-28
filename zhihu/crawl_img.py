@@ -151,9 +151,10 @@ def parse_page(html, url):
                     'height': img.get('height', '')  # 添加高度
                 })
                 valid_count += 1
-                print(f"  有效图片 {valid_count}: {img_url}")
+                # print(f"  有效图片 {valid_count}: {img_url}")
             elif img_url:
-                print(f"  过滤无效图片: {img_url[:100]}...")  # 只显示前100个字符
+                # print(f"  过滤无效图片: {img_url[:100]}...")  # 只显示前100个字符
+                pass
 
         print(f"共找到 {len(img_tags)} 个img标签，其中 {valid_count} 张有效图片")
     else:

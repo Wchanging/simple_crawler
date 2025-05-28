@@ -7,6 +7,7 @@ toutiao/
 __pycache__/
 
 # 忽略文件
+.gitignore
 weibo_cookie.json
 cookies.txt
 weibo_urls.txt
@@ -14,3 +15,5 @@ zhihu_cookie*.json
 zhihu_urls.txt
 comments*.csv
 filtered_urls*.txt
+zhihu_data*.csv
+*.txt
