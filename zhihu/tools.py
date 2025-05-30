@@ -133,12 +133,14 @@ def filter_urls_in_csv(urls_file, csv_file):
 
 # 在主函数中添加转换功能
 if __name__ == "__main__":
-    csv_file = 'zhihu/comments_full.csv'
-    urls_file = 'zhihu/zhihu_urls.txt'
+    csv_file = 'zhihu/comments_full_2.csv'
+    # urls_file = 'zhihu/zhihu_urls.txt'
 
     # 步骤1: 计算comments_full.csv中的评论数量和ID数量
     print("\n步骤1: 计算评论数量和ID数量")
-    total_comments = count_comments_in_csv(csv_file)
+    # total_comments = count_comments_in_csv(csv_file)
+
+    article_ids, answer_ids, question_ids = count_ids_in_csv(csv_file)
 
     # print("\n步骤2: 筛选URL")
     # filtered_urls = filter_urls_in_csv(urls_file, csv_file)
