@@ -258,12 +258,12 @@ class XiaohongshuSearchCrawler:
 
             # 更新选择器，专门针对小红书搜索结果页面的笔记链接
             selectors = [
+                "a[href*='/explore/']",         # 备用格式
                 "a[href*='/search_result/']",  # 主要的笔记链接格式
                 "a.cover",                     # 封面链接
                 "a.mask",                      # 带遮罩的链接
                 ".note-item a",               # 笔记项目链接
-                "section a[href*='/search_result/']",  # section下的搜索结果链接
-                "a[href*='/explore/']",        # 备用格式
+                "section a[href*='/search_result/']"  # section下的搜索结果链接
             ]
 
             for selector in selectors:

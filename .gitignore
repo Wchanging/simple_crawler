@@ -18,3 +18,4 @@ comments*.csv
 filtered_urls*.txt
 zhihu_data*.csv
 *.txt
+xhs/all_data*.json
