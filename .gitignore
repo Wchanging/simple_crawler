@@ -5,12 +5,15 @@ weibo_results*/
 zhihu/zhihu_results*/
 xhs/xhs_results*/
 toutiao/
+weixin/weixin_articles
+all_data/
 __pycache__/
 
 # 忽略文件
 .gitignore
-weibo_cookie.json
 cookies.txt
+weixin/url.xlsx
+weibo_cookie.json
 weibo_urls.txt
 zhihu_cookie*.json
 zhihu_urls.txt
@@ -19,3 +22,5 @@ filtered_urls*.txt
 zhihu_data*.csv
 *.txt
 xhs/all_data*.json
+douyin/douyin_results*
+douyin/all_data*

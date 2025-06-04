@@ -18,6 +18,6 @@ def download_image(url, save_path):
 
 # 测试
 if __name__ == "__main__":
-    image_url = "https://pic2.zhimg.com/v2-084654f6c7eb1497bc47ed7e939bd433_1440w.jpg"
+    image_url = "https://wx4.sinaimg.cn/orj1080/41b2921egy1i027k1fpigj20p00gomzq.jpg"
     save_path = "downloaded_image.jpg"
     download_image(image_url, save_path)

@@ -100,7 +100,7 @@ def extract_urls_to_file(json_path="weibo/weibo_results2/merged.json", output_fi
         new_urls = []
         for item in data:
             # 获取微博url
-            if 'publish_url' in item and item['comment_count'] > 3:
+            if 'publish_url' in item and item['comment_count'] >= 5:
                 original_url = item['publish_url']
                 new_urls.append(original_url)
     print(f"提取到 {len(new_urls)} 条微博URL")
@@ -118,7 +118,7 @@ def extract_urls_to_file(json_path="weibo/weibo_results2/merged.json", output_fi
             print(f"加载现有URL文件失败: {e}")
 
     # 合并并去重
-    all_urls = set(new_urls) | existing_urls # 使用集合进行去重
+    all_urls = set(new_urls) | existing_urls  # 使用集合进行去重
     sorted_urls = sorted(all_urls)  # 排序以保持一致性
 
     # # 写入到txt文件
@@ -141,12 +141,12 @@ def extract_urls_to_file(json_path="weibo/weibo_results2/merged.json", output_fi
     print(f"已保存 {len(sorted_urls)} 条微博URL到 {output_file} (新增 {len(all_urls) - len(existing_urls)} 条)")
 
 
-def main(directory="weibo/weibo_results3", merged_json="merge.json", urls_file="weibo_urls.txt"):
+def main(directory="weibo/weibo_results_0604", merged_json="merge.json", urls_file="weibo/weibo_urls2.txt"):
     """
     主函数：执行合并JSON和提取URL的完整流程
     """
     # 合并JSON文件
-    # data = merge_json_files(directory, merged_json, incremental=True)
+    data = merge_json_files(directory, merged_json, incremental=True)
 
     # 提取URL并保存
     json_path = os.path.join(directory, merged_json)

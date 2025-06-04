@@ -28,21 +28,26 @@ def get_data_from_json(data):
     data_list = []
     data = data['data'].get('data', [])
     for item in data:
+        if item.get('type') != 1:
+            continue
         aweme_id = item.get('aweme_info', {}).get('aweme_id', '')
         desc = item.get('aweme_info', {}).get('desc', '')
         create_time = item.get('aweme_info', {}).get('create_time', [0])
         # author = item['aweme_info']['author']['uid'],
         author = item['aweme_info']['author'].get('uid', '')
         author_name = item['aweme_info']['author'].get('nickname', '')
+        gender = item['aweme_info']['author'].get("gender", 0)
         try:
             # music_id = item['aweme_info']['music']['id_str'],
             music_id = item['aweme_info']['music'].get('id_str', '')
+            music_urls = item['aweme_info']['music'].get('play_url', {}).get('url_list', [])
         except KeyError:
             music_id = ""
-        video_uri = item['aweme_info']['video'].get('play_addr', {}).get('uri', '')
+            music_urls = []
         video_url = item['aweme_info']['video'].get('play_addr', {}).get('url_list', [])
+        duration = item['aweme_info']['video'].get('duration', 0)
         cover_url = item['aweme_info']['video'].get('cover', {}).get('url_list', [])
-        share_url = item['aweme_info']['share_info'].get('share_url', '')
+        share_url = item['aweme_info'].get('share_info', {}).get('share_url', '')
         # statistics 评论数 点赞数 分享数 收藏数
         # comment_count = item['aweme_info']['statistics']['comment_count'],
         comment_count = item['aweme_info']['statistics'].get('comment_count', 0)
@@ -62,10 +67,12 @@ def get_data_from_json(data):
             'create_time': datetime.fromtimestamp(create_time).strftime('%Y-%m-%d %H:%M:%S'),
             'author': author,
             'author_name': author_name,
+            'gender': gender,
             'follower_count': follower_count,
             'music_id': music_id,
-            'video_uri': video_uri,
+            'music_urls': music_urls,
             'video_url': video_url,
+            'duration': duration,
             'cover_url': cover_url,
             'share_url': share_url,
             'comment_count': comment_count,
@@ -108,7 +115,7 @@ def delete_same_data(data):
 
 if __name__ == "__main__":
     # 打开指定文件夹，读取所有JSON文件
-    folder_path = 'xhs/xhs_results_from_tikhub'
+    folder_path = 'douyin/douyin_results_tikhub_new'
     all_data = []
     for file_name in os.listdir(folder_path):
         if file_name.endswith('.json'):
@@ -118,6 +125,8 @@ if __name__ == "__main__":
                 all_data.extend(get_data_from_json(data))
     # 删除重复数据
     all_data = delete_same_data(all_data)
+    # 打印数据条数
+    print(f"总数据条数: {len(all_data)}")
     # 保存所有数据到一个新的JSON文件
-    output_file_path = 'xhs/all_data.json'
+    output_file_path = 'douyin/all_data2.json'
     save_data_to_json(all_data, output_file_path)

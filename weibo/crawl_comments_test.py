@@ -18,7 +18,7 @@ def add_count():
 
 
 def get_header():
-    with open("weibo_cookie.json", 'r') as f:
+    with open("weibo/weibo_cookie.json", 'r') as f:
         header = json.loads(f.read())
     return header
 
@@ -60,7 +60,7 @@ def get_comment_data(data):
     rootidstr = data['rootidstr']
     created_at = data['created_at']
     dt = datetime.strptime(created_at, "%a %b %d %H:%M:%S %z %Y")
-    created_at = dt.strftime("%Y-%m-%d %H:%M:%S")
+    created_at = int(dt.timestamp())  # 转成timestamp
     user_id = data['user']['id']
     text_raw = data['text_raw']
     like = data['like_counts']
@@ -251,24 +251,24 @@ def interactive_mode(mode=2, filepath="weibo/weibo_urls.txt", output_file="weibo
 
 if __name__ == "__main__":
     # 读取weibo_urls.txt文件
-    with open("weibo/weibo_urls.txt", "r", encoding="utf-8") as f:
+    with open("weibo/weibo_urls2.txt", "r", encoding="utf-8") as f:
         urls = [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
     # 创建目录(如果不存在)
-    os.makedirs("weibo_details", exist_ok=True)
+    os.makedirs("weibo/weibo_details_06_04", exist_ok=True)
 
     # 第一次调用使用覆盖模式，创建新文件
     first_url = False
 
-    for url in urls[124:]:
+    for url in urls:
         # 爬取单个微博URL的所有评论
-        interactive_mode(mode="1", one_url=url)
+        interactive_mode(mode="1", output_file="weibo/weibo_details_06_04/review_data.csv", one_url=url)
 
         print(f"等待5秒，避免频繁请求")
         time.sleep(10)
 
         # 爬取微博详情 - 第一个URL时不追加，之后的URL都追加
-        crawl_pipeline([url], append=True)
+        crawl_pipeline([url], file_name="weibo/weibo_details_06_04/meta_data.csv", append=True)
 
         # 标记已处理第一个URL
         if first_url:
