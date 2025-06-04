@@ -10,6 +10,7 @@ all_data/
 __pycache__/
 
 # 忽略文件
+.env
 .gitignore
 cookies.txt
 weixin/url.xlsx

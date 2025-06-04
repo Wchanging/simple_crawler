@@ -4,22 +4,24 @@ import json
 import os
 import requests
 import time
+from dotenv import load_dotenv
 
-# 导入tikhub | Import tikhub
-from tikhub import Client
-
-# 初始化Client | Initialize Client
-client = Client(base_url="https://api.tikhub.io",
-                api_key="")
 
 if __name__ == "__main__":
+    # 加载环境变量
+    load_dotenv()
+
+    # 从外部获取API密钥
+    api_key = os.getenv('TIKHUB_API_KEY')
+    if not api_key:
+        raise ValueError("请在.env文件中设置TIKHUB_API_KEY")
     # 获取单个作品数据 | Get single video data
     # video_data = asyncio.run(client.DouyinWeb.fetch_video_comments(aweme_id="7510518369545358650",cursor=0, count=40))
     # 保存数据到文件 | Save data to file
     url = "https://api.tikhub.io/api/v1/douyin/search/fetch_video_search_v1"
     headers = {
         'accept': 'application/json',
-        'Authorization': 'Bearer ',
+        'Authorization': 'Bearer ' + api_key,
         'Content-Type': 'application/json'
     }
 
@@ -46,7 +48,7 @@ if __name__ == "__main__":
             times += 1
         # 解析响应内容 | Parse response content
         video_data = response.json()
-        
+
         # search_id = video_data.get("data", {}).get("extra", {}).get("logid", "")
         # print(f"第 {i} 次请求成功，新的search_id为: {search_id}")
         with open(f"douyin/douyin_results_tikhub_new/video_data_3_{i}.json", "w", encoding="utf-8") as f:
