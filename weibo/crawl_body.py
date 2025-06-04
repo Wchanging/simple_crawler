@@ -18,8 +18,8 @@ def get_weibo_data(data):
     text = data['text_raw']
     # 发布时间
     created_at = data['created_at']
-    dt = datetime.strptime(created_at, "%a %b %d %H:%M:%S %z %Y")
-    created_at = dt.strftime("%Y-%m-%d %H:%M:%S")
+    dt = datetime.strptime(created_at, "%a %b %d %H:%M:%S %z %Y")  # 将字符串转换为datetime对象
+    created_at = int(dt.timestamp())  # 转换为时间戳
     # 地区
     try:
         region = data['region_name']
@@ -64,7 +64,7 @@ def get_weibo_data(data):
 
 
 def get_header():
-    with open("weibo_cookie.json", 'r') as f:
+    with open("weibo/weibo_cookie.json", 'r') as f:
         header = json.loads(f.read())
     return header
 
@@ -125,7 +125,7 @@ def crawl_pipeline(urls, file_name='weibo_details/meta_data.csv', append=True):
 
             # 每爬一条微博，随机等待2-5秒，防止反爬
             print(f"爬取微博ID: {mid} 成功，等待下一条...")
-            sleep_time = random.uniform(2, 5)
+            sleep_time = random.uniform(4, 5)
             print(f"等待 {sleep_time:.2f} 秒...")
             time.sleep(sleep_time)
 

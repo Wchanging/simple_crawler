@@ -129,8 +129,8 @@ class WeiboSearchCrawler:
         # 构造搜索URL，需要编码关键词
         from urllib.parse import quote
         encoded_keyword = quote(keyword)
-        search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}&rd=realtime&tw=realtime&Refer=weibo_realtime"
-        # search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}"
+        # search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}&rd=realtime&tw=realtime&Refer=weibo_realtime"
+        search_url = f"https://s.weibo.com/weibo?q={encoded_keyword}"
 
         print(f"开始搜索关键词: {keyword}")
         self.browser.get(search_url)
@@ -284,7 +284,7 @@ class WeiboSearchCrawler:
         self.close_browser()
 
 
-def main(keywords=['None'], cookie_path="cookies.txt", output_dir="weibo_results3"):
+def main(keywords=['None'], cookie_path="cookies.txt", output_dir="weibo/weibo_results_0604"):
     # 使用示例
     keywords = keywords or ["小米SU7高速碰撞爆燃事件细节"]
     cookie_path = cookie_path
@@ -320,6 +320,6 @@ def main(keywords=['None'], cookie_path="cookies.txt", output_dir="weibo_results
 
 
 if __name__ == "__main__":
-    main(keywords=["小米SU7高速碰撞爆燃事件细节"],
+    main(keywords=["俄乌冲突"],
          cookie_path="cookies.txt",
-         output_dir="weibo_results3")
+         output_dir="weibo/weibo_results_0604")
