@@ -1,9 +1,5 @@
-import csv
 import pandas as pd
-import os
-import json
 import re
-from bs4 import BeautifulSoup
 
 
 def extract_image_urls(text):
@@ -251,16 +247,16 @@ def clean_weibo_comments_data(input_file, output_file):
 
     # 修改过滤逻辑：保留文字长度>=3的记录 OR 包含图片的记录
     original_count = len(df)
-    df = df[(df['text_raw'].str.len() >= 3) | (df['img_url'] != '')]
+    df = df[(df['text_raw'].str.len() >= 7) | (df['img_url'] != '')]
     filtered_count = len(df)
 
     print(f"过滤后CSV文件包含 {filtered_count} 条记录")
     print(f"删除了 {original_count - filtered_count} 条短内容且无图片的记录")
 
     # 统计不同类型的记录数
-    text_only = len(df[(df['text_raw'].str.len() >= 3) & (df['img_url'] == '')])
+    text_only = len(df[(df['text_raw'].str.len() >= 7) & (df['img_url'] == '')])
     img_only = len(df[(df['text_raw'].str.len() < 3) & (df['img_url'] != '')])
-    text_and_img = len(df[(df['text_raw'].str.len() >= 3) & (df['img_url'] != '')])
+    text_and_img = len(df[(df['text_raw'].str.len() >= 7) & (df['img_url'] != '')])
     img_count = len(df[df['img_url'] != ''])
 
     print(f"记录类型统计：")
