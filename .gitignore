@@ -25,3 +25,4 @@ zhihu_data*.csv
 xhs/all_data*.json
 douyin/douyin_results*
 douyin/all_data*
+*final_results/
