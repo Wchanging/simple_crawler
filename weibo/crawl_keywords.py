@@ -17,7 +17,7 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 class WeiboSearchCrawler:
-    def __init__(self, driver_path='D:\Anaconda\envs\crawl\msedgedriver.exe', headless=False, output_dir="weibo_results3"):
+    def __init__(self, driver_path='C:\\Users\\w_changing\\.conda\\envs\\crawler\\msedgedriver.exe', headless=False, output_dir="weibo_results3"):
         """
         初始化微博搜索爬虫
 
@@ -35,7 +35,7 @@ class WeiboSearchCrawler:
             self.options.add_argument('--disable-dev-shm-usage')
 
         self.browser = None
-        self.output_dir = "weibo_results3"
+        self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
 
     def start_browser(self):
@@ -301,7 +301,7 @@ def main(keywords=['None'], cookie_path="cookies.txt", output_dir="weibo/weibo_r
         # 爬取每个关键词
         for keyword in keywords:
             print(f"\n开始爬取关键词: {keyword}")
-            results = crawler.search_keyword(keyword, max_pages=50)
+            results = crawler.search_keyword(keyword, max_pages=1)
 
             # 打印部分结果
             # if results:
@@ -322,4 +322,4 @@ def main(keywords=['None'], cookie_path="cookies.txt", output_dir="weibo/weibo_r
 if __name__ == "__main__":
     main(keywords=["俄乌冲突"],
          cookie_path="cookies.txt",
-         output_dir="weibo/weibo_results_0604")
+         output_dir="weibo/weibo_results_0608")

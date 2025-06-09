@@ -6,6 +6,7 @@ zhihu/zhihu_results*/
 xhs/xhs_results*/
 toutiao/
 weixin/weixin_articles
+weixin/weixin_comments
 all_data/
 __pycache__/
 
