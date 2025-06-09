@@ -206,10 +206,10 @@ if __name__ == "__main__":
 
     # 读取指定文件夹中的所有JSON文件
 
-    folder_path = 'weixin/weixin_articles'
-    all_data = get_json_data_from_file(folder_path)
-    # 存储所有数据到一个新的JSON文件
-    output_file = 'weixin/weixin_all_data.json'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump(all_data, f, ensure_ascii=False, indent=2)
-    print(f"所有数据已保存到 {output_file}")
+    # folder_path = 'weixin/weixin_articles'
+    # all_data = get_json_data_from_file(folder_path)
+    # # 存储所有数据到一个新的JSON文件
+    # output_file = 'weixin/weixin_all_data.json'
+    # with open(output_file, 'w', encoding='utf-8') as f:
+    #     json.dump(all_data, f, ensure_ascii=False, indent=2)
+    # print(f"所有数据已保存到 {output_file}")
