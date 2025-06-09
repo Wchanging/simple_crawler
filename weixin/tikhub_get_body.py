@@ -198,11 +198,11 @@ if __name__ == "__main__":
     api_key = os.getenv('TIKHUB_API_KEY')
     if not api_key:
         raise ValueError("请在.env文件中设置TIKHUB_API_KEY")
-    # urls = read_urls_from_txt('weixin/url.txt')
-    # # print(urls)
-    # print(f"读取到 {len(urls)} 个URL")
-    # # read_urls_from_xlsx('weixin/url.xlsx', 'weixin/url2.txt')
-    # save_data_to_json(urls)
+    urls = read_urls_from_txt('weixin/url.txt')
+    # print(urls)
+    print(f"读取到 {len(urls)} 个URL")
+    # read_urls_from_xlsx('weixin/url.xlsx', 'weixin/url2.txt')
+    save_data_to_json(urls)
 
     # 读取指定文件夹中的所有JSON文件
 
