@@ -243,12 +243,12 @@ def get_data_from_json(data):
 
 if __name__ == "__main__":
     # 加载环境变量
-    # load_dotenv()
+    load_dotenv()
 
-    # # 从外部获取API密钥
-    # api_key = os.getenv("TIKHUB_API_KEY")
-    # if not api_key:
-    #     raise ValueError("请在.env文件中设置TIKHUB_API_KEY")
+    # 从外部获取API密钥
+    api_key = os.getenv("TIKHUB_API_KEY")
+    if not api_key:
+        raise ValueError("请在.env文件中设置TIKHUB_API_KEY")
     # urls = read_urls_from_txt("weixin/url.txt")
     # # print(urls)
     # print(f"读取到 {len(urls)} 个URL")

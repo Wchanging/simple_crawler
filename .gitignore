@@ -9,6 +9,8 @@ weixin/weixin_articles
 weixin/weixin_comments
 all_data/
 __pycache__/
+*final_results/
+*results_final/
 
 # 忽略文件
 .env
@@ -26,4 +28,4 @@ zhihu_data*.csv
 xhs/all_data*.json
 douyin/douyin_results*
 douyin/all_data*
-*final_results/
+qwen.py

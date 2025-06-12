@@ -102,7 +102,7 @@ class ZhiHu_CommentCrawler:
                         'author': author,
                         'author_name': author_name,
                         'gender': gender,
-                        'created_time': datetime.fromtimestamp(created_time).strftime('%Y-%m-%d %H:%M:%S'),
+                        'created_time': created_time,
                         'created_area': created_area,
                         'child_comment_count': child_comment_count,
                         'is_article': article_id != ''

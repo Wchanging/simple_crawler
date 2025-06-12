@@ -31,11 +31,33 @@ def clean_comment_content(text):
     return text.strip()
 
 
-if __name__ == "__main__":
+def clean_articles(file_path, output_path):
+    """
+    清洗文章内容并保存到CSV文件。
 
-    # 清洗评论内容
-    # 读取json
-    with open('weixin/weixin_final_results/weixin_comments.json', 'r', encoding='utf-8') as f:
+    :param file_path: 输入的JSON文件路径
+    :param output_path: 输出的CSV文件路径
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
+        articles = json.load(f)
+
+    # 清洗content
+    for art in articles:
+        art['content'] = clean_article_content(art.get('content', ''))
+
+    # 转为DataFrame
+    df_articles = pd.DataFrame(articles)
+    df_articles.to_csv(output_path, index=False, encoding='utf-8-sig')
+
+
+def clean_comments(file_path, output_path):
+    """
+    清洗评论内容并保存到CSV文件。
+
+    :param file_path: 输入的JSON文件路径
+    :param output_path: 输出的CSV文件路径
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
         comments = json.load(f)
 
     # 清洗content
@@ -53,23 +75,44 @@ if __name__ == "__main__":
 
     # 转为DataFrame
     df_comments = pd.DataFrame(unique_comments)
-    df_comments.to_csv('weixin/weixin_final_results/weixin_comments_clean.csv',
-                       index=False, encoding='utf-8-sig')
+    df_comments.to_csv(output_path, index=False, encoding='utf-8-sig')
 
-    # -----—------------------------------------------------
 
-    # 清洗文章内容
-    with open('weixin/weixin_final_results/weixin_articles.json', 'r', encoding='utf-8') as f:
-        articles = json.load(f)
+def delet_articles_without_comments(file_path_articles, file_path_comments, output_path):
+    """
+    删除没有评论的文章。
 
-    # 清洗content
-    for art in articles:
-        art['content'] = clean_article_content(art.get('content', ''))
+    :param file_path_articles: 文章CSV文件路径
+    :param file_path_comments: 评论CSV文件路径
+    :output_path: 输出的CSV文件路径
+    """
+    df_articles = pd.read_csv(file_path_articles, encoding='utf-8-sig')
+    df_comments = pd.read_csv(file_path_comments, encoding='utf-8-sig')
 
-    # 转为DataFrame
-    df_articles = pd.DataFrame(articles)
-    df_articles.to_csv('weixin/weixin_final_results/weixin_articles_clean.csv',
-                       index=False, encoding='utf-8-sig')
+    # 获取有评论的文章ID
+    comment_article_ids = set(df_comments['url'])
+
+    # 过滤出有评论的文章
+    df_filtered_articles = df_articles[df_articles['url'].isin(comment_article_ids)]
+    df_filtered_articles.to_csv(output_path, index=False, encoding='utf-8-sig')
+
+
+if __name__ == "__main__":
+
+    # # 清洗评论内容
+    # clean_comments('weixin/weixin_final_results/weixin_comments.json',
+    #                'weixin/weixin_final_results/weixin_comments_clean.csv')
+    # # -----—------------------------------------------------
+    # # 清洗文章内容
+    # clean_articles('weixin/weixin_final_results/weixin_articles.json',
+    #                'weixin/weixin_final_results/weixin_articles_clean.csv')
+
+    # 删除没有评论的文章
+    delet_articles_without_comments(
+        'weixin/weixin_final_results/weixin_articles_clean.csv',
+        'weixin/weixin_final_results/weixin_comments_clean.csv',
+        'weixin/weixin_final_results/weixin_articles_with_comments.csv'
+    )
 
     # # 读取文章内容csv
     # df_articles = pd.read_csv(

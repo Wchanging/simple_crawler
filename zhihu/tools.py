@@ -17,9 +17,8 @@ def count_comments_in_csv(csv_file):
     print(f"CSV文件 {csv_file} 包含 {total_comments} 条评论")
     return total_comments
 
+
 # 计算comments_full.csv中有多少article_id，多少answer_id
-
-
 def count_ids_in_csv(csv_file):
     if not os.path.exists(csv_file):
         print(f"文件 {csv_file} 不存在")
@@ -44,6 +43,45 @@ def count_ids_in_csv(csv_file):
     print(f"CSV文件 {csv_file} 包含 {total_article_ids} 个不同的文章ID，{total_answer_ids} 个不同的回答ID，{total_question_ids} 个不同的问题ID")
 
     return article_ids, answer_ids, question_ids
+
+
+# 把一个csv文件的内容并到另一个csv文件中（追加模式: 两个文件的列名必须一致）
+def append_csv(source_file, target_file):
+    if not os.path.exists(source_file):
+        print(f"源文件 {source_file} 不存在")
+        return
+
+    if not os.path.exists(target_file):
+        print(f"目标文件 {target_file} 不存在，创建新文件")
+        with open(target_file, 'w', encoding='utf-8-sig') as f:
+            pass  # 创建空文件
+
+    try:
+        source_df = pd.read_csv(source_file, encoding="utf-8-sig",
+                                dtype={'article_id': str, 'answer_id': str, 'question_id': str, 'comment_id': str, 'super_comment_id': str})
+        source_df.to_csv(target_file, mode='a', header=False, index=False, encoding='utf-8-sig')
+        print(f"已将 {source_file} 的内容追加到 {target_file}")
+    except Exception as e:
+        print(f"追加CSV时出错: {e}")
+
+
+# 截取csv文件的前n行，删除后面的行
+def truncate_csv(file_path, n):
+    if not os.path.exists(file_path):
+        print(f"文件 {file_path} 不存在")
+        return
+
+    try:
+        df = pd.read_csv(file_path, encoding="utf-8-sig",
+                         dtype={'article_id': str, 'answer_id': str, 'question_id': str, 'comment_id': str, 'super_comment_id': str})
+        if len(df) <= n:
+            print(f"文件 {file_path} 的行数少于或等于 {n}，无需截取")
+            return
+        truncated_df = df.head(n)
+        truncated_df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        print(f"已将 {file_path} 截取前 {n} 行")
+    except Exception as e:
+        print(f"截取CSV时出错: {e}")
 
 
 def change_url(url):
@@ -133,15 +171,21 @@ def filter_urls_in_csv(urls_file, csv_file):
 
 # 在主函数中添加转换功能
 if __name__ == "__main__":
-    csv_file = 'zhihu/comments_full_2.csv'
+    # csv_file = 'zhihu/comments_full_2.csv'
     # urls_file = 'zhihu/zhihu_urls.txt'
 
     # 步骤1: 计算comments_full.csv中的评论数量和ID数量
-    print("\n步骤1: 计算评论数量和ID数量")
+    # print("\n步骤1: 计算评论数量和ID数量")
     # total_comments = count_comments_in_csv(csv_file)
 
-    article_ids, answer_ids, question_ids = count_ids_in_csv(csv_file)
+    # article_ids, answer_ids, question_ids = count_ids_in_csv(csv_file)
 
     # print("\n步骤2: 筛选URL")
     # filtered_urls = filter_urls_in_csv(urls_file, csv_file)
     # print(f"筛选后的URL数量: {len(filtered_urls)}")
+
+    # 追加CSV文件
+    append_csv('zhihu/zhihu_results_final/comments_with_stance_all.csv', 'zhihu/zhihu_results_final/comments_with_stance_all2.csv')
+
+    # 截取CSV文件前250行
+    # truncate_csv('zhihu/zhihu_results_final/comments_with_stance_all2.csv', 250)

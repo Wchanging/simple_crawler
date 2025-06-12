@@ -35,6 +35,39 @@ def read_urls_from_xlsx(file_path, save_path):
                 file.write(url.strip() + '\n')
 
 
+# 从txt文件中读取url，对比已有的url，保存新的url到txt文件中
+def read_urls_from_txt_and_save_new(file_path, save_path):
+    """
+    从指定的txt文件中读取URL列表，并将新的URL保存到另一个txt文件中。
+
+    :param file_path: 原始txt文件的路径
+    :param save_path: 保存新URL的txt文件路径
+    """
+    if not os.path.exists(file_path):
+        print(f"文件 {file_path} 不存在")
+        return
+
+    existing_urls = set()
+    if os.path.exists(save_path):
+        with open(save_path, 'r', encoding='utf-8') as f:
+            existing_urls = set(line.strip() for line in f if line.strip())
+
+    new_urls = []
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            url = line.strip()
+            if url and url not in existing_urls:
+                new_urls.append(url)
+
+    if new_urls:
+        with open(save_path, 'a', encoding='utf-8') as f:
+            for url in new_urls:
+                f.write(url + '\n')
+        print(f"已保存 {len(new_urls)} 个新URL到 {save_path}")
+    else:
+        print("没有新的URL需要保存")
+
+
 # 从txt文件中读取每个url
 def read_urls_from_txt(file_path):
     """

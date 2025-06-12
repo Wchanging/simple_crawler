@@ -320,6 +320,12 @@ def clean_zhihu_comments_data(input_file, output_file):
     print("正在清理HTML内容...")
     df["content"] = df["content"].apply(clean_content_pipeline)
 
+    # 将created_time列从2023-10-01 12:00:00格式转换为时间戳
+    # if "created_time" in df.columns:
+    #     print("正在转换created_time列为时间戳...")
+    #     df["created_time"] = pd.to_datetime(df["created_time"], errors="coerce")
+    #     df["created_time"] = df["created_time"].astype("int64") // 10**9
+
     # 过滤掉content内容长度小于3的记录
     print("正在过滤短内容...")
     # 首先处理NaN值
@@ -417,16 +423,12 @@ def clean_zhihu_meta_data(input_file, output_file):
 if __name__ == "__main__":
 
     # 清理知乎评论数据
-    input_file = (
-        "zhihu/zhihu_results_final/comments_full_2.csv"  # 请修改为你的实际输入路径
-    )
+    input_file = "zhihu/zhihu_results_final/comments_full_2.csv"  # 请修改为你的实际输入路径
     output_file = "zhihu/zhihu_results_final/cleaned_zhihu_comments_data.csv"  # 请修改为你的实际输出路径
     clean_zhihu_comments_data(input_file, output_file)
 
     # 清理知乎元数据
-    input_file = (
-        "zhihu/zhihu_results_final/zhihu_meta_data.csv"  # 请修改为你的实际输入路径
-    )
+    input_file = "zhihu/zhihu_results_final/zhihu_meta_data.csv"  # 请修改为你的实际输入路径
     output_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data.csv"  # 请修改为你的实际输出路径
     clean_zhihu_meta_data(input_file, output_file)
 
