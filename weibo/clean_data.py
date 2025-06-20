@@ -295,6 +295,11 @@ def clean_weibo_meta_data(input_file, output_file):
     if 'title' in df.columns:
         columns_to_clean.append('title')
 
+    #  把时间列从datatime转换为timestamp字符串
+    if 'created_at' in df.columns:
+        df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce').astype('int64') // 10**9
+        df['created_at'] = df['created_at'].astype(str)
+
     if not columns_to_clean:
         print("错误：CSV文件中没有找到需要清理的文本列（content/text/title）")
         print(f"现有列名：{df.columns.tolist()}")
@@ -338,28 +343,57 @@ def analyze_weibo_data_structure(file_path):
     print("-" * 50)
 
 
+# 去除一个csv文件的qwen,qwen_sentiment,qwen_intent三列
+def remove_qwen_columns(input_file, output_file):
+    """
+    去除指定CSV文件中的qwen, qwen_sentiment, qwen_intent三列
+    """
+    try:
+        df = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+    except:
+        try:
+            df = pd.read_csv(input_file, encoding="gbk", dtype=str)
+        except:
+            df = pd.read_csv(input_file, encoding="utf-8", dtype=str)
+
+    # 检查并删除指定列
+    columns_to_remove = ['qwen', 'qwen_sentiment', 'qwen_intent']
+    for col in columns_to_remove:
+        if col in df.columns:
+            df.drop(columns=[col], inplace=True)
+
+    # 保存清理后的数据
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")
+    print(f"已将 {input_file} 中的指定列删除，并保存到 {output_file}")
+
+
 if __name__ == "__main__":
 
-    # 分析数据结构（可选）
-    print("分析数据结构...")
-    # analyze_weibo_data_structure("meta_data_updated_filtered.csv")
-    # analyze_weibo_data_structure("cleaned_review_data.csv")
+    # # 分析数据结构（可选）
+    # print("分析数据结构...")
+    # # analyze_weibo_data_structure("meta_data_updated_filtered.csv")
+    # # analyze_weibo_data_structure("cleaned_review_data.csv")
 
-    # 清理微博评论数据
-    print("\n开始清理微博评论数据...")
-    input_file = "weibo/weibo_final_results/weibo_review_data.csv"  # 请修改为你的实际输入路径
-    output_file = "weibo/weibo_final_results/cleaned_weibo_comments_data.csv"  # 请修改为你的实际输出路径
-    clean_weibo_comments_data(input_file, output_file)
+    # # 清理微博评论数据
+    # print("\n开始清理微博评论数据...")
+    # input_file = "weibo/weibo_final_results/weibo_review_data.csv"  # 请修改为你的实际输入路径
+    # output_file = "weibo/weibo_final_results/cleaned_weibo_comments_data.csv"  # 请修改为你的实际输出路径
+    # clean_weibo_comments_data(input_file, output_file)
 
-    # 清理微博元数据
-    print("\n开始清理微博元数据...")
-    input_file = "weibo/weibo_final_results/weibo_meta_data.csv"  # 请修改为你的实际输入路径
-    output_file = "weibo/weibo_final_results/cleaned_weibo_meta_data.csv"  # 请修改为你的实际输出路径
-    clean_weibo_meta_data(input_file, output_file)
+    # # 清理微博元数据
+    # print("\n开始清理微博元数据...")
+    # input_file = "weibo/weibo_details/meta_data.csv"  # 请修改为你的实际输入路径
+    # output_file = "weibo/weibo_final_results/cleaned_weibo_meta_data2.csv"  # 请修改为你的实际输出路径
+    # clean_weibo_meta_data(input_file, output_file)
 
-    # 保存匹配信息
-    print("\n开始保存匹配信息...")
-    save_matched_info_from_meta_data('weibo/weibo_final_results/cleaned_weibo_meta_data.csv',
-                                     'weibo/weibo_final_results/cleaned_weibo_comments_data.csv')
-    save_matched_info_from_review_data('weibo/weibo_final_results/cleaned_weibo_comments_data.csv',
-                                       'weibo/weibo_final_results/cleaned_weibo_meta_data_matched.csv')
+    # # 保存匹配信息
+    # print("\n开始保存匹配信息...")
+    # save_matched_info_from_meta_data('weibo/weibo_final_results/cleaned_weibo_meta_data2.csv',
+    #                                  'weibo/weibo_final_results/cleaned_weibo_comments_data.csv')
+    # save_matched_info_from_review_data('weibo/weibo_final_results/cleaned_weibo_comments_data.csv',
+    #                                    'weibo/weibo_final_results/cleaned_weibo_meta_data2_matched.csv')
+
+    remove_qwen_columns(
+        input_file='weibo/weibo_final_results/comments_qwen_ds.csv',
+        output_file='weibo/weibo_final_results/comments_ds.csv'
+    )

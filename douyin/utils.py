@@ -97,6 +97,7 @@ def save_data_to_json(data, file_path):
         except Exception as e:
             print(f"保存数据时出错: {e}")
 
+
 def delete_same_data(data):
     """
     删除重复的数据。
@@ -112,6 +113,7 @@ def delete_same_data(data):
             seen.add(aweme_id)
             unique_data.append(item)
     return unique_data
+
 
 if __name__ == "__main__":
     # 打开指定文件夹，读取所有JSON文件
@@ -130,3 +132,24 @@ if __name__ == "__main__":
     # 保存所有数据到一个新的JSON文件
     output_file_path = 'douyin/all_data2.json'
     save_data_to_json(all_data, output_file_path)
+
+    # # 对比两个JSON文件的数据，将不同的数据保存到一个新的JSON文件
+    # file1_path = 'douyin/all_data.json'
+    # file2_path = 'douyin/all_data2.json'
+    # file1_data = get_json_data_from_file(file1_path)
+    # file2_data = get_json_data_from_file(file2_path)
+    # if file1_data and file2_data:
+    #     file1_set = {item['aweme_id'] for item in file1_data}
+    #     file2_set = {item['aweme_id'] for item in file2_data}
+
+    #     # 找出在file2中但不在file1中的数据
+    #     diff_data = [item for item in file2_data if item['aweme_id'] not in file1_set]
+
+    #     # 打印不同数据的条数
+    #     print(f"不同数据条数: {len(diff_data)}")
+
+    #     # 保存不同的数据到新的JSON文件
+    #     diff_file_path = 'douyin/diff_data.json'
+    #     save_data_to_json(diff_data, diff_file_path)
+    # else:
+    #     print("无法读取文件数据，检查文件路径和内容格式。")

@@ -394,7 +394,14 @@ def clean_xhs_content_data(input_file, output_file):
     for col in time_columns:
         if col in df.columns:
             print(f"正在转换{col}时间戳...")
-            df[f'{col}_readable'] = df[col].apply(convert_timestamp)
+            df[col] = df[col].apply(convert_timestamp)
+
+    # 筛除time数值在1743091200以前的记录
+    if 'time' in df.columns:
+        print("正在筛除time数值在1743091200以前的记录...")
+        df = df[df['time'] >= 1743091200]
+    else:
+        print("警告：CSV文件中没有'time'列，无法进行时间筛选")
 
     # 处理数值字段
     numeric_columns = ['liked_count', 'collected_count', 'comment_count', 'share_count']

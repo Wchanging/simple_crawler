@@ -183,12 +183,15 @@ def clean_douyin_comments_data(input_file, output_file):
     """
     # 读取CSV文件cid,text,aweme_id,create_time,digg_count,status,uid,nickname,reply_id,reply_comment,text_extra,reply_to_reply_id,is_note_comment,ip_label,root_comment_id,level,cotent_type
     try:
-        df = pd.read_csv(input_file, encoding="utf-8-sig", dtype={'aweme_id': str, 'cid': str, 'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
+        df = pd.read_csv(input_file, encoding="utf-8-sig", dtype={'aweme_id': str, 'cid': str,
+                         'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
     except:
         try:
-            df = pd.read_csv(input_file, encoding="gbk", dtype={'aweme_id': str, 'cid': str, 'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
+            df = pd.read_csv(input_file, encoding="gbk", dtype={'aweme_id': str, 'cid': str,
+                             'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
         except:
-            df = pd.read_csv(input_file, encoding="utf-8", dtype={'aweme_id': str, 'cid': str, 'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
+            df = pd.read_csv(input_file, encoding="utf-8", dtype={'aweme_id': str, 'cid': str,
+                             'uid': str, 'reply_id': str, 'reply_to_reply_id': str, 'root_comment_id': str})
 
     # 输出原始条目数
     print(f"原始CSV文件包含 {len(df)} 条记录")
@@ -276,6 +279,13 @@ def clean_douyin_meta_data(input_file, output_file):
     url_pattern = r'https?://[^\s]+'
     df['desc'] = df['desc'].str.replace(url_pattern, '', regex=True)
 
+    # 去除create_time数值在1743091200之前的记录
+    print("正在过滤过早的记录...")
+    if 'create_time' in df.columns:
+        df = df[df['create_time'] >= 1743091200]
+    else:
+        print("警告：CSV文件中没有'create_time'列，无法过滤过早的记录")
+
     # 计算文本长度
     df['text_length'] = df['desc'].apply(lambda x: len(str(x)) if pd.notna(x) else 0)
 
@@ -330,5 +340,7 @@ if __name__ == "__main__":
 
     # 保存匹配信息
     print("\n开始保存匹配信息...")
-    save_matched_info_from_meta_data('douyin/douyin_results_final/cleaned_douyin_meta_data.csv', 'douyin/douyin_results_final/cleaned_douyin_comments_data.csv')
-    save_matched_info_from_comment_data('douyin/douyin_results_final/cleaned_douyin_comments_data.csv', 'douyin/douyin_results_final/cleaned_douyin_meta_data_matched.csv')
+    save_matched_info_from_meta_data('douyin/douyin_results_final/cleaned_douyin_meta_data.csv',
+                                     'douyin/douyin_results_final/cleaned_douyin_comments_data.csv')
+    save_matched_info_from_comment_data('douyin/douyin_results_final/cleaned_douyin_comments_data.csv',
+                                        'douyin/douyin_results_final/cleaned_douyin_meta_data_matched.csv')
