@@ -453,25 +453,72 @@ def analyze_xhs_data_structure(file_path):
 if __name__ == "__main__":
 
     # 分析数据结构（可选）
-    print("分析数据结构...")
+    # print("分析数据结构...")
     # analyze_xhs_data_structure("xhs_results_final/xhs_content.csv")
     # analyze_xhs_data_structure("xhs_results_final/xhs_comments.csv")
 
     # 清理小红书评论数据
     print("\n开始清理小红书评论数据...")
-    input_file = "xhs/xhs_results_final/xhs_comments.csv"  # 请修改为你的实际输入路径
-    output_file = "xhs/xhs_results_final/cleaned_xhs_comments_data.csv"  # 请修改为你的实际输出路径
+    input_file = "xhs/xhs_results_final/comments_ds.csv"  # 请修改为你的实际输入路径
+    output_file = "xhs/xhs_results_final/cleaned_xhs_comments_ds.csv"  # 请修改为你的实际输出路径
     clean_xhs_comments_data(input_file, output_file)
 
     # 清理小红书内容数据
     print("\n开始清理小红书内容数据...")
-    input_file = "xhs/xhs_results_final/xhs_content.csv"  # 请修改为你的实际输入路径
+    input_file = "xhs/xhs_results_final/cleaned_xhs_content_data_matched_stance_sentiment_intent.csv"  # 请修改为你的实际输入路径
     output_file = "xhs/xhs_results_final/cleaned_xhs_content_data.csv"  # 请修改为你的实际输出路径
     clean_xhs_content_data(input_file, output_file)
 
-    # 保存匹配信息
+    # 保存匹配信息;';''';''''
     print("\n开始保存匹配信息...")
     save_matched_info_from_meta_data('xhs/xhs_results_final/cleaned_xhs_content_data.csv',
-                                     'xhs/xhs_results_final/cleaned_xhs_comments_data.csv')
-    save_matched_info_from_comment_data('xhs/xhs_results_final/cleaned_xhs_comments_data.csv',
+                                     'xhs/xhs_results_final/cleaned_xhs_comments_ds.csv')
+    save_matched_info_from_comment_data('xhs/xhs_results_final/cleaned_xhs_comments_ds.csv',
                                         'xhs/xhs_results_final/cleaned_xhs_content_data_matched.csv')
+
+    # rename
+    # comment_id,create_time,ip_location,note_id,content,user_id,nickname,avatar,sub_comment_count,pictures,parent_comment_id,last_modify_ts,like_count,mentions,ds_stance,ds_sentiment,ds_intent
+    # note_id,type,title,desc,video_url,time,last_update_time,user_id,nickname,avatar,liked_count,collected_count,comment_count,share_count,ip_location,image_list,tag_list,last_modify_ts,note_url,source_keyword,xsec_token,desc_hashtags,desc_mentions,title_hashtags,title_mentions,time_readable,last_update_time_readable,last_modify_ts_readable,desc_length,title_length,multimodal_stance,multimodal_sentiment,multimodal_intent
+
+    input_file = "xhs/xhs_results_final/cleaned_xhs_comments_ds_matched.csv"
+    output_file = "xhs/xhs_results_final/cleaned_xhs_comments_ds_renamed.csv"
+
+    df = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+
+    # 重命名列
+    df.rename(columns={'note_id': 'article_id',
+                       'create_time': 'created_time',
+                       'ip_location': 'location',
+                       'user_id': 'uid',
+                       'nickname': 'username',
+                       'sub_comment_count': 'child_comment_count',
+                       'pictures': 'img_urls',
+                       'ds_stance': 'stance',
+                       'ds_sentiment': 'sentiment',
+                       'ds_intent': 'intent'}, inplace=True)
+
+    # 输出output文件
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")
+    print(f"重命名后的数据已保存到：{output_file}")
+
+    input_file = "xhs/xhs_results_final/cleaned_xhs_content_data_matched.csv"
+    output_file = "xhs/xhs_results_final/cleaned_xhs_content_data_renamed.csv"
+
+    df = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+    # 重命名列
+    df.rename(columns={'note_id': 'article_id',
+                       'desc': 'content',
+                       'video_url': 'video_urls',
+                       'time': 'created_time',
+                       'last_update_time': 'updated_time',
+                       'user_id': 'uid',
+                       'nickname': 'username',
+                       'liked_count': 'like_count',
+                       'ip_location': 'location',
+                       'image_list': 'img_urls',
+                       'multimodal_stance': 'stance',
+                       'multimodal_sentiment': 'sentiment',
+                       'multimodal_intent': 'intent'}, inplace=True)
+    # 输出output文件
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")
+    print(f"重命名后的数据已保存到：{output_file}")

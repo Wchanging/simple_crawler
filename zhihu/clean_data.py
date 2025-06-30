@@ -415,6 +415,14 @@ def clean_zhihu_meta_data(input_file, output_file):
     df["content"] = df["content"].str.replace(url_pattern, "", regex=True)
     df["title"] = df["title"].str.replace(url_pattern, "", regex=True)
 
+    # 筛选时间在1743264000之后的记录
+    print("正在筛选时间...")
+    if "publish_time" in df.columns:
+        df = df[df["publish_time"] > 1743264000]  # 2025-01-01 00:00:00的时间戳
+        # 输出筛选后的记录
+        print(f"筛选后CSV文件包含 {len(df)} 条记录")
+    else:
+        print("警告：CSV文件中没有'created_time'列，无法进行时间筛选")
     # 保存清理后的数据
     df.to_csv(output_file, index=False, encoding="utf-8-sig")
     print(f"清理后的数据已保存到：{output_file}")
@@ -422,22 +430,76 @@ def clean_zhihu_meta_data(input_file, output_file):
 
 if __name__ == "__main__":
 
-    # 清理知乎评论数据
-    input_file = "zhihu/zhihu_results_final/comments_full_2.csv"  # 请修改为你的实际输入路径
-    output_file = "zhihu/zhihu_results_final/cleaned_zhihu_comments_data.csv"  # 请修改为你的实际输出路径
-    clean_zhihu_comments_data(input_file, output_file)
+    # # 清理知乎评论数据
+    # input_file = "zhihu/zhihu_results_final/comments_ds.csv"  # 请修改为你的实际输入路径
+    # output_file = "zhihu/zhihu_results_final/cleaned_zhihu_comments_ds.csv"  # 请修改为你的实际输出路径
+    # clean_zhihu_comments_data(input_file, output_file)
 
-    # 清理知乎元数据
-    input_file = "zhihu/zhihu_results_final/zhihu_meta_data.csv"  # 请修改为你的实际输入路径
-    output_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data.csv"  # 请修改为你的实际输出路径
-    clean_zhihu_meta_data(input_file, output_file)
+    # # 清理知乎元数据
+    # input_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data_matched_stance_sentiment_intent.csv"  # 请修改为你的实际输入路径
+    # output_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data.csv"  # 请修改为你的实际输出路径
+    # clean_zhihu_meta_data(input_file, output_file)
 
-    # 保存匹配信息
-    save_matched_info_from_meta_data(
-        "zhihu/zhihu_results_final/cleaned_zhihu_meta_data.csv",
-        "zhihu/zhihu_results_final/cleaned_zhihu_comments_data.csv",
+    # # 保存匹配信息
+    # save_matched_info_from_meta_data(
+    #     "zhihu/zhihu_results_final/cleaned_zhihu_meta_data.csv",
+    #     "zhihu/zhihu_results_final/cleaned_zhihu_comments_ds.csv",
+    # )
+    # save_matched_info_from_review_data(
+    #     "zhihu/zhihu_results_final/cleaned_zhihu_comments_ds.csv",
+    #     "zhihu/zhihu_results_final/cleaned_zhihu_meta_data_matched.csv",
+    # )
+
+    # rename
+    input_file = "zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_matched.csv"
+
+    df = pd.read_csv(
+        input_file,
+        encoding="utf-8-sig",
+        dtype=str,
     )
-    save_matched_info_from_review_data(
-        "zhihu/zhihu_results_final/cleaned_zhihu_comments_data.csv",
-        "zhihu/zhihu_results_final/cleaned_zhihu_meta_data_matched.csv",
+    if "author" in df.columns:
+        df.rename(columns={"author": "uid"}, inplace=True)
+    if "super_comment_id" in df.columns:
+        df.rename(columns={"super_comment_id": "parent_comment_id"}, inplace=True)
+    if "author_name" in df.columns:
+        df.rename(columns={"author_name": "username"}, inplace=True)
+    if "ds_stance" in df.columns:
+        df.rename(columns={"ds_stance": "stance"}, inplace=True)
+    if "ds_sentiment" in df.columns:
+        df.rename(columns={"ds_sentiment": "sentiment"}, inplace=True)
+    if "ds_intent" in df.columns:
+        df.rename(columns={"ds_intent": "intent"}, inplace=True)
+    if "img_url" in df.columns:
+        df.rename(columns={"img_url": "img_urls"}, inplace=True)
+    if "created_area" in df.columns:
+        df.rename(columns={"created_area": "location"}, inplace=True)
+    if "child_comment_count" in df.columns:
+        df.rename(columns={"child_comment_count": "comment_count"}, inplace=True)
+
+    output_file = "zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_renamed.csv"
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")
+
+    input_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data_matched.csv"
+    df = pd.read_csv(
+        input_file,
+        encoding="utf-8-sig",
+        dtype=str,
     )
+    if "author_id" in df.columns:
+        df.rename(columns={"author_id": "uid"}, inplace=True)
+    if "author_name" in df.columns:
+        df.rename(columns={"author_name": "username"}, inplace=True)
+    if "vote_count" in df.columns:
+        df.rename(columns={"vote_count": "like_count"}, inplace=True)
+    if "multimodal_stance" in df.columns:
+        df.rename(columns={"multimodal_stance": "stance"}, inplace=True)
+    if "multimodal_sentiment" in df.columns:
+        df.rename(columns={"multimodal_sentiment": "sentiment"}, inplace=True)
+    if "multimodal_intent" in df.columns:
+        df.rename(columns={"multimodal_intent": "intent"}, inplace=True)
+    if "publish_time" in df.columns:
+        df.rename(columns={"publish_time": "created_time"}, inplace=True)
+
+    output_file = "zhihu/zhihu_results_final/cleaned_zhihu_meta_data_renamed.csv"
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")

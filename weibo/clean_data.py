@@ -295,10 +295,10 @@ def clean_weibo_meta_data(input_file, output_file):
     if 'title' in df.columns:
         columns_to_clean.append('title')
 
-    #  把时间列从datatime转换为timestamp字符串
-    if 'created_at' in df.columns:
-        df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce').astype('int64') // 10**9
-        df['created_at'] = df['created_at'].astype(str)
+    # #  把时间列从datatime转换为timestamp字符串
+    # if 'created_at' in df.columns:
+    #     df['created_at'] = pd.to_datetime(df['created_at'], errors='coerce').astype('int64') // 10**9
+    #     df['created_at'] = df['created_at'].astype(str)
 
     if not columns_to_clean:
         print("错误：CSV文件中没有找到需要清理的文本列（content/text/title）")
@@ -367,33 +367,189 @@ def remove_qwen_columns(input_file, output_file):
     print(f"已将 {input_file} 中的指定列删除，并保存到 {output_file}")
 
 
+def remove_multi_stance(input_file, output_file):
+    """
+    有些评论因为内容是分点的，所以会有多个立场，情感，意图
+    但是这些内容因为处理不得当，全部被保留了下来且只放在了stance列
+    但是因为我们只需要一个立场，情感，意图，所以需要去除多余的立场，情感，意图，并把对应的情感和意图放在对应的列中
+    """
+    # 读取CSV文件
+    try:
+        df = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+    except:
+        try:
+            df = pd.read_csv(input_file, encoding="gbk", dtype=str)
+        except:
+            df = pd.read_csv(input_file, encoding="utf-8", dtype=str)
+
+    # 检查是否包含 'stance' 列
+    if 'stance' not in df.columns:
+        print("错误：CSV文件中没有找到'stance'列")
+        return
+
+    print(f"原始数据包含 {len(df)} 条记录")
+    
+    # 如果不存在 sentiment 和 intent 列，则创建它们
+    if 'sentiment' not in df.columns:
+        df['sentiment'] = ''
+    if 'intent' not in df.columns:
+        df['intent'] = ''
+    
+    # 应用解析函数
+    print("正在解析多立场数据...")
+    
+    # 直接遍历DataFrame，逐行处理
+    processed_count = 0
+    for idx, row in df.iterrows():
+        stance_str = row['stance']
+        
+        # 检查是否需要处理
+        if pd.isna(stance_str) or stance_str == '':
+            continue
+            
+        stance_str = str(stance_str).strip()
+        bracket_count = stance_str.count('[')
+        
+        if bracket_count < 3:
+            continue  # 不是多立场格式，跳过
+        
+        try:
+            # 使用正则表达式提取所有的 [xxx, xxx] 格式内容
+            pattern = r'\[([^\]]+)\]'
+            matches = re.findall(pattern, stance_str)
+            
+            if len(matches) >= 3:
+                # 解析第一组（立场）
+                stance_parts = matches[0].split(',')
+                stance = stance_parts[0].strip() if len(stance_parts) > 0 else ''
+                stance_desc = stance_parts[1].strip() if len(stance_parts) > 1 else ''
+                
+                # 解析第二组（情感）  
+                sentiment_parts = matches[1].split(',')
+                sentiment = sentiment_parts[0].strip() if len(sentiment_parts) > 0 else ''
+                sentiment_desc = sentiment_parts[1].strip() if len(sentiment_parts) > 1 else ''
+                
+                # 解析第三组（意图）
+                intent_parts = matches[2].split(',')
+                intent = intent_parts[0].strip() if len(intent_parts) > 0 else ''
+                intent_desc = intent_parts[1].strip() if len(intent_parts) > 1 else ''
+                
+                # 直接更新原DataFrame的对应行
+                df.at[idx, 'stance'] = f'[{stance}, {stance_desc}]' if stance_desc else f'[{stance}]'
+                df.at[idx, 'sentiment'] = f'[{sentiment}, {sentiment_desc}]' if sentiment_desc else f'[{sentiment}]'
+                df.at[idx, 'intent'] = f'[{intent}, {intent_desc}]' if intent_desc else f'[{intent}]'
+                
+                processed_count += 1
+                
+        except Exception as e:
+            print(f"解析错误 {stance_str}: {e}")
+            continue
+    
+    print(f"发现并处理了 {processed_count} 行包含多立场信息")
+    
+    # 统计处理结果
+    valid_stance = (df['stance'] != '').sum()
+    valid_sentiment = (df['sentiment'] != '').sum()
+    valid_intent = (df['intent'] != '').sum()
+    
+    print(f"处理结果统计:")
+    print(f"- 总记录数: {len(df)}")
+    print(f"- 处理的多立场记录数: {processed_count}")
+    print(f"- 有效立场数: {valid_stance}")
+    print(f"- 有效情感数: {valid_sentiment}")
+    print(f"- 有效意图数: {valid_intent}")
+    
+    # 显示一些处理后的示例
+    if processed_count > 0:
+        print("\n处理后的示例数据:")
+        # 找到一些被处理过的行来展示
+        sample_count = 0
+        for idx, row in df.iterrows():
+            if sample_count >= 3:
+                break
+            if '[' in str(row['stance']) and '[' in str(row['sentiment']) and '[' in str(row['intent']):
+                print(f"立场: {row['stance']}")
+                print(f"情感: {row['sentiment']}")  
+                print(f"意图: {row['intent']}")
+                print("-" * 30)
+                sample_count += 1
+    
+    # 保存处理后的数据
+    df.to_csv(output_file, index=False, encoding="utf-8-sig")
+    print(f"处理后的数据已保存到: {output_file}")
+    
+    return df
+
+    
+
+
 if __name__ == "__main__":
 
-    # # 分析数据结构（可选）
+    remove_multi_stance(
+        input_file='weibo/weibo_final_results/cleaned_weibo_comments_ds_renamed.csv',
+        output_file='weibo/weibo_final_results/cleaned_weibo_comments_ds_split.csv')
+
+    # 分析数据结构（可选）
     # print("分析数据结构...")
     # # analyze_weibo_data_structure("meta_data_updated_filtered.csv")
     # # analyze_weibo_data_structure("cleaned_review_data.csv")
 
     # # 清理微博评论数据
     # print("\n开始清理微博评论数据...")
-    # input_file = "weibo/weibo_final_results/weibo_review_data.csv"  # 请修改为你的实际输入路径
-    # output_file = "weibo/weibo_final_results/cleaned_weibo_comments_data.csv"  # 请修改为你的实际输出路径
+    # input_file = "weibo/weibo_final_results/comments_ds.csv"  # 请修改为你的实际输入路径
+    # output_file = "weibo/weibo_final_results/cleaned_weibo_comments_ds.csv"  # 请修改为你的实际输出路径
     # clean_weibo_comments_data(input_file, output_file)
 
     # # 清理微博元数据
     # print("\n开始清理微博元数据...")
-    # input_file = "weibo/weibo_details/meta_data.csv"  # 请修改为你的实际输入路径
-    # output_file = "weibo/weibo_final_results/cleaned_weibo_meta_data2.csv"  # 请修改为你的实际输出路径
+    # input_file = "weibo/weibo_final_results/cleaned_weibo_meta_data_matched_stance_sentiment_intent.csv"  # 请修改为你的实际输入路径
+    # output_file = "weibo/weibo_final_results/cleaned_weibo_meta_data.csv"  # 请修改为你的实际输出路径
     # clean_weibo_meta_data(input_file, output_file)
 
     # # 保存匹配信息
     # print("\n开始保存匹配信息...")
-    # save_matched_info_from_meta_data('weibo/weibo_final_results/cleaned_weibo_meta_data2.csv',
-    #                                  'weibo/weibo_final_results/cleaned_weibo_comments_data.csv')
-    # save_matched_info_from_review_data('weibo/weibo_final_results/cleaned_weibo_comments_data.csv',
-    #                                    'weibo/weibo_final_results/cleaned_weibo_meta_data2_matched.csv')
+    # save_matched_info_from_meta_data('weibo/weibo_final_results/cleaned_weibo_meta_data.csv',
+    #                                  'weibo/weibo_final_results/cleaned_weibo_comments_ds.csv')
+    # save_matched_info_from_review_data('weibo/weibo_final_results/cleaned_weibo_comments_ds.csv',
+    #                                    'weibo/weibo_final_results/cleaned_weibo_meta_data_matched.csv')
 
-    remove_qwen_columns(
-        input_file='weibo/weibo_final_results/comments_qwen_ds.csv',
-        output_file='weibo/weibo_final_results/comments_ds.csv'
-    )
+    # remove_qwen_columns(
+    #     input_file='weibo/weibo_final_results/comments_qwen_ds.csv',
+    #     output_file='weibo/weibo_final_results/comments_ds.csv'
+    # )
+
+    # input_file = 'weibo/weibo_final_results/cleaned_weibo_comments_ds_matched.csv'
+
+    # df = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+    # df.rename(columns={'mid': 'article_id',
+    #                    'review_id': 'comment_id',
+    #                    'sup_comment': 'parent_comment_id',
+    #                    'created_at': 'created_time',
+    #                    'text_raw': 'content',
+    #                    'source': 'location',
+    #                    'like': 'like_count',
+    #                    'img_url': 'img_urls',
+    #                    'review_num': 'comment_count',
+    #                    'ds_stance': 'stance',
+    #                    'ds_sentiment': 'sentiment',
+    #                    'ds_intent': 'intent'}, inplace=True)
+
+    # output_file = 'weibo/weibo_final_results/cleaned_weibo_comments_ds_renamed.csv'
+    # df.to_csv(output_file, index=False, encoding="utf-8-sig")
+
+    # input_file = 'weibo/weibo_final_results/cleaned_weibo_meta_data_matched.csv'
+    # df_meta = pd.read_csv(input_file, encoding="utf-8-sig", dtype=str)
+    # df_meta.rename(columns={'mid': 'article_id',
+    #                         'created_at': 'created_time',
+    #                         'text': 'content',
+    #                         'region': 'location',
+    #                         'pic_num': 'img_count',
+    #                         'pic_url': 'img_urls',
+    #                         'video_url': 'video_urls',
+    #                         'comments_count': 'comment_count',
+    #                         'multimodal_stance': 'stance',
+    #                         'multimodal_sentiment': 'sentiment',
+    #                         'multimodal_intent': 'intent'}, inplace=True)
+
+    # output_file_meta = 'weibo/weibo_final_results/cleaned_weibo_meta_data_renamed.csv'
+    # df_meta.to_csv(output_file_meta, index=False, encoding="utf-8-sig")

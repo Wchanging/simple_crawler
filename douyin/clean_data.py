@@ -319,28 +319,132 @@ def analyze_douyin_data_structure(file_path):
     print("-" * 50)
 
 
+# 将两份评论数据中相同cid的记录输出到一个新的CSV文件中
+def merge_comments_by_cid(file1, file2, output_file):
+    """
+    将两份评论数据中相同cid的记录输出到一个新的CSV文件中
+    """
+    df1 = pd.read_csv(file1, encoding='utf-8-sig', dtype=str)
+    df2 = pd.read_csv(file2, encoding='utf-8-sig', dtype=str)
+
+    # 合并数据
+    merged_df = pd.merge(df1, df2, on='cid', suffixes=('_file1', '_file2'))
+
+    # 保存合并后的数据
+    merged_df.to_csv(output_file, index=False, encoding='utf-8-sig')
+    print(f"合并后的数据已保存到：{output_file}")
+
+
 if __name__ == "__main__":
 
     # 分析数据结构（可选）
-    print("分析数据结构...")
+    # print("分析数据结构...")
     # analyze_douyin_data_structure("douyin_results_final/merged_body.csv")
     # analyze_douyin_data_structure("douyin_results_final/merged_comments.csv")
 
     # 清理抖音评论数据
-    print("\n开始清理抖音评论数据...")
-    input_file = "douyin/douyin_results_final/merged_comments.csv"  # 请修改为你的实际输入路径
-    output_file = "douyin/douyin_results_final/cleaned_douyin_comments_data.csv"  # 请修改为你的实际输出路径
-    clean_douyin_comments_data(input_file, output_file)
+    # print("\n开始清理抖音评论数据...")
+    # input_file = "douyin/douyin_results_final/comments_ds.csv"  # 请修改为你的实际输入路径
+    # output_file = "douyin/douyin_results_final/cleaned_douyin_comments_ds.csv"  # 请修改为你的实际输出路径
+    # clean_douyin_comments_data(input_file, output_file)
 
-    # 清理抖音元数据
-    print("\n开始清理抖音元数据...")
-    input_file = "douyin/douyin_results_final/merged_body.csv"  # 请修改为你的实际输入路径
-    output_file = "douyin/douyin_results_final/cleaned_douyin_meta_data.csv"  # 请修改为你的实际输出路径
-    clean_douyin_meta_data(input_file, output_file)
+    # # 清理抖音元数据
+    # print("\n开始清理抖音元数据...")
+    # input_file = "douyin/douyin_results_final/cleaned_douyin_meta_data_matched_stance.csv"  # 请修改为你的实际输入路径
+    # output_file = "douyin/douyin_results_final/cleaned_douyin_meta_data.csv"  # 请修改为你的实际输出路径
+    # clean_douyin_meta_data(input_file, output_file)
 
-    # 保存匹配信息
-    print("\n开始保存匹配信息...")
-    save_matched_info_from_meta_data('douyin/douyin_results_final/cleaned_douyin_meta_data.csv',
-                                     'douyin/douyin_results_final/cleaned_douyin_comments_data.csv')
-    save_matched_info_from_comment_data('douyin/douyin_results_final/cleaned_douyin_comments_data.csv',
-                                        'douyin/douyin_results_final/cleaned_douyin_meta_data_matched.csv')
+    # # 保存匹配信息
+    # print("\n开始保存匹配信息...")
+    # save_matched_info_from_meta_data('douyin/douyin_results_final/cleaned_douyin_meta_data.csv',
+    #                                  'douyin/douyin_results_final/cleaned_douyin_comments_ds.csv')
+    # save_matched_info_from_comment_data('douyin/douyin_results_final/cleaned_douyin_comments_ds.csv',
+    #                                     'douyin/douyin_results_final/cleaned_douyin_meta_data_matched.csv')
+
+    # rename
+    # cid,text,aweme_id,create_time,digg_count,status,uid,nickname,reply_id,reply_comment,text_extra,reply_to_reply_id,is_note_comment,ip_label,root_comment_id,level,cotent_type,mentions,ds_stance,ds_sentiment,ds_intent
+    input_file = "douyin/douyin_results_final/cleaned_douyin_comments_ds_matched.csv"
+    output_file = "douyin/douyin_results_final/cleaned_douyin_comments_ds_renamed.csv"
+
+    df = pd.read_csv(input_file, encoding='utf-8-sig', dtype=str)
+    # 重命名列
+    df.rename(columns={'cid': 'comment_id',
+                       'text': 'content',
+                       'aweme_id': 'article_id',
+                       'create_time': 'created_time',
+                       'digg_count': 'like_count',
+                       'nickname': 'username',
+                       'reply_id': 'parent_comment_id',
+                       'reply_to_reply_id': 'parent_parent_comment_id',
+                       'text_extra': 'extra_info',
+                       'ip_label': 'location',
+                       'root_comment_id': 'root_comment_id',
+                       'ds_stance': 'stance',
+                       'ds_sentiment': 'sentiment',
+                       'ds_intent': 'intent'}, inplace=True)
+    # 保存重命名后的数据
+    df.to_csv(output_file, index=False, encoding='utf-8-sig')
+
+    input_file = "douyin/douyin_results_final/cleaned_douyin_meta_data_matched.csv"
+    output_file = "douyin/douyin_results_final/cleaned_douyin_meta_data_renamed.csv"
+
+    # aweme_id,desc,create_time,author_uid,author_name,gender,follower_count,music_id,music_urls,video_url,duration,cover_url,share_url,comment_count,digg_count,share_count,collect_count,hashtags,text_length,hashtag_count,multimodal_stance
+    df = pd.read_csv(input_file, encoding='utf-8-sig', dtype=str)
+    # 重命名列
+    df.rename(columns={'aweme_id': 'article_id',
+                       'desc': 'content',
+                       'create_time': 'created_time',
+                       'author_uid': 'uid',
+                       'author_name': 'username',
+                       'video_url': 'video_urls',
+                       'digg_count': 'like_count'}, inplace=True)
+    # 针对multimodal_stance列进行处理
+    # 例如："[中立, 事实报道],[中立, 事实陈述],[信息验证, 事实核实]"
+    # 按照列表分成三列
+    if 'multimodal_stance' in df.columns:
+        print("正在处理multimodal_stance列...")
+
+        def parse_multimodal_stance(stance_str):
+            if pd.isna(stance_str) or stance_str == '':
+                return pd.Series(['', '', ''])
+
+            try:
+                stance_str = str(stance_str).strip()
+
+                # 使用正则表达式提取三个完整的列表内容
+                pattern = r'\[([^\]]+)\],\[([^\]]+)\],\[([^\]]+)\]'
+                match = re.search(pattern, stance_str)
+
+                if match:
+                    stance = f"[{match.group(1)}]"      # [中立, 事实报道]
+                    sentiment = f"[{match.group(2)}]"   # [中立, 事实陈述]
+                    intent = f"[{match.group(3)}]"      # [信息验证, 事实核实]
+                    return pd.Series([stance, sentiment, intent])
+                else:
+                    print(f"格式异常: {stance_str}")
+                    return pd.Series(['', '', ''])
+
+            except Exception as e:
+                print(f"解析错误 {stance_str}: {e}")
+                return pd.Series(['', '', ''])
+
+        # 应用解析函数
+        stance_df = df['multimodal_stance'].apply(parse_multimodal_stance)
+        stance_df.columns = ['stance', 'sentiment', 'intent']
+
+        # 将新列添加到原始DataFrame中
+        df = pd.concat([df, stance_df], axis=1)
+
+        # 删除原始的multimodal_stance列
+        df.drop(columns=['multimodal_stance'], inplace=True)
+
+        print("multimodal_stance列处理完成")
+        print("示例结果:")
+        print(stance_df.head())
+
+    else:
+        print("警告：CSV文件中没有'multimodal_stance'列，无法处理")
+
+    # 保存重命名后的数据
+    df.to_csv(output_file, index=False, encoding='utf-8-sig')
+    print(f"重命名后的数据已保存到: {output_file}")

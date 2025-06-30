@@ -26,10 +26,7 @@ zhihu_cookie*.json
 xhs/all_data*.json
 douyin/diff_data*.json
 
-zhihu_data*.csv
-comments*.csv
-
+*.csv
 *.txt
 
 qwen*.py
-utils.py
