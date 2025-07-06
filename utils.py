@@ -221,19 +221,61 @@ def split_multi_stance(input_file, output_file):
     return df
 
 
+# 去除意图列，然后根据立场和情感列的内容筛选，如果立场（stance）和情感（sentiment）列有一个值为其他，则删除该行
+def filter_stance_sentiment(input_file, output_file):
+    """
+    去除意图列，然后根据立场和情感列的内容筛选，如果立场（stance）和情感（sentiment）列有一个值为其他，则删除该行。
+
+    :param input_file: 输入CSV文件路径
+    :param output_file: 输出CSV文件路径
+    """
+    try:
+        df = pd.read_csv(input_file, encoding='utf-8-sig', dtype=str)
+        # # 删除意图列
+        # if 'intent' in df.columns:
+        #     df.drop(columns=['intent'], inplace=True)
+
+        # 筛选立场和情感列
+        if 'stance' in df.columns and 'sentiment' in df.columns:
+            # 只保留立场和情感列中不包含'其他'的行
+            df_filtered = df[~df['stance'].str.contains('其他', na=False) & ~df['sentiment'].str.contains('其他', na=False)]
+        else:
+            print("错误：CSV文件中没有找到'stance'或'sentiment'列")
+            return
+
+        # 保存到新的CSV文件
+        df_filtered.to_csv(output_file, index=False, encoding='utf-8-sig')
+        print(f"已将筛选后的数据保存到 {output_file}")
+
+    except Exception as e:
+        print(f"处理数据时出错: {e}")
+
+
 if __name__ == "__main__":
 
+    # 示例：筛选立场和情感列，去除意图列
+    filter_stance_sentiment('weibo/weibo_final_results/cleaned_weibo_comments_ds_split.csv',
+                            'filter_data/cleaned_weibo_comments_ds_filtered.csv')
+    filter_stance_sentiment('douyin/douyin_results_final/cleaned_douyin_comments_ds_split.csv',
+                            'filter_data/cleaned_douyin_comments_ds_filtered.csv')
+    filter_stance_sentiment('zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_split.csv',
+                            'filter_data/cleaned_zhihu_comments_ds_filtered.csv')
+    filter_stance_sentiment('xhs/xhs_results_final/cleaned_xhs_comments_ds_split.csv',
+                            'filter_data/cleaned_xhs_comments_ds_filtered.csv')
+    filter_stance_sentiment('weixin/weixin_final_results/cleaned_weixin_comments_ds_split.csv',
+                            'filter_data/cleaned_weixin_comments_ds_filtered.csv')
+
     # 示例：将CSV文件中的多立场数据解析并保存到新的CSV文件中
-    split_multi_stance('weibo/weibo_final_results/cleaned_weibo_comments_ds_renamed.csv',
-                       'weibo/weibo_final_results/cleaned_weibo_comments_ds_split.csv')
-    split_multi_stance('douyin/douyin_results_final/cleaned_douyin_comments_ds_renamed.csv',
-                       'douyin/douyin_results_final/cleaned_douyin_comments_ds_split.csv')
-    split_multi_stance('zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_renamed.csv',
-                       'zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_split.csv')
-    split_multi_stance('xhs/xhs_results_final/cleaned_xhs_comments_ds_renamed.csv',
-                       'xhs/xhs_results_final/cleaned_xhs_comments_ds_split.csv')
-    split_multi_stance('weixin/weixin_final_results/weixin_comments_clean_with_ds_renamed.csv',
-                       'weixin/weixin_final_results/cleaned_weixin_comments_ds_split.csv')
+    # split_multi_stance('weibo/weibo_final_results/cleaned_weibo_comments_ds_renamed.csv',
+    #                    'weibo/weibo_final_results/cleaned_weibo_comments_ds_split.csv')
+    # split_multi_stance('douyin/douyin_results_final/cleaned_douyin_comments_ds_renamed.csv',
+    #                    'douyin/douyin_results_final/cleaned_douyin_comments_ds_split.csv')
+    # split_multi_stance('zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_renamed.csv',
+    #                    'zhihu/zhihu_results_final/cleaned_zhihu_comments_ds_split.csv')
+    # split_multi_stance('xhs/xhs_results_final/cleaned_xhs_comments_ds_renamed.csv',
+    #                    'xhs/xhs_results_final/cleaned_xhs_comments_ds_split.csv')
+    # split_multi_stance('weixin/weixin_final_results/weixin_comments_clean_with_ds_renamed.csv',
+    #                    'weixin/weixin_final_results/cleaned_weixin_comments_ds_split.csv')
 
     # # # 输入CSV文件路径
     # input_csv_file = ['douyin/douyin_results_final/comments_ds.csv',
